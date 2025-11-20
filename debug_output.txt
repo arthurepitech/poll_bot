@@ -1,0 +1,19 @@
+browserType.launch: Executable doesn't exist at /Users/arthurdossantos/Library/Caches/ms-playwright/chromium_headless_shell-1194/chrome-mac/headless_shell
+╔═════════════════════════════════════════════════════════════════════════╗
+║ Looks like Playwright Test or Playwright was just installed or updated. ║
+║ Please run the following command to download new browsers:              ║
+║                                                                         ║
+║     npx playwright install                                              ║
+║                                                                         ║
+║ <3 Playwright Team                                                      ║
+╚═════════════════════════════════════════════════════════════════════════╝
+    at testParsing (/Users/arthurdossantos/Documents/Poll Everywhere bot/src/verify_parsing.ts:8:36)
+    at Object.<anonymous> (/Users/arthurdossantos/Documents/Poll Everywhere bot/src/verify_parsing.ts:105:1)
+    at Module.m._compile (/Users/arthurdossantos/Documents/Poll Everywhere bot/node_modules/ts-node/src/index.ts:1618:23)
+    at Object.require.extensions.<computed> (/Users/arthurdossantos/Documents/Poll Everywhere bot/node_modules/ts-node/src/index.ts:1621:12)
+    at phase4 (/Users/arthurdossantos/Documents/Poll Everywhere bot/node_modules/ts-node/src/bin.ts:649:14)
+    at bootstrap (/Users/arthurdossantos/Documents/Poll Everywhere bot/node_modules/ts-node/src/bin.ts:95:10)
+    at main (/Users/arthurdossantos/Documents/Poll Everywhere bot/node_modules/ts-node/src/bin.ts:55:10)
+    at Object.<anonymous> (/Users/arthurdossantos/Documents/Poll Everywhere bot/node_modules/ts-node/src/bin.ts:800:3) {
+  name: 'Error'
+}
