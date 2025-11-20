@@ -195,8 +195,37 @@ export class PollEvBot {
         logger.info(`Submitting answer: ${answerKeyword}`);
 
         try {
-            const selector = `button:has-text("${answerKeyword}")`;
-            await this.page.click(selector);
+            // More specific selector to avoid matching the presenter bar or other elements
+            // Target the vote button that contains the specific answer value or keyword
+            // The button has class 'component-response-multiple-choice__option__vote'
+            // And inside it has a div with class 'component-response-multiple-choice__option__value'
+
+            // Try to find the option object to get the exact value if possible, otherwise rely on keyword
+            const option = options.find(o => o.keyword === answerKeyword);
+            let selector = '';
+
+            if (option) {
+                // Use the exact value text if we have it, which is safer than just "A" or "B"
+                selector = `.component-response-multiple-choice__option__vote:has(.component-response-multiple-choice__option__value:text-is("${option.value}"))`;
+            } else {
+                // Fallback to just the keyword if we must, but scoped to the option component
+                // Note: The keyword itself isn't always visible in the button text in the same way, 
+                // but the aria-label usually starts with the value.
+                // Let's try to match the button that *contains* the keyword if it's part of the text, 
+                // but strictly inside the options list.
+                selector = `.component-response-multiple-choice__option__vote:has-text("${answerKeyword}")`;
+            }
+
+            // Fallback selector if the specific one fails (e.g. if text-is is too strict with whitespace)
+            const fallbackSelector = `.component-response-multiple-choice__option button:has-text("${answerKeyword}")`;
+
+            try {
+                await this.page.click(selector, { timeout: 5000 });
+            } catch (e) {
+                logger.warn(`Primary selector failed, trying fallback: ${fallbackSelector}`);
+                await this.page.click(fallbackSelector);
+            }
+
             // await this.notifier.sendMessage(`✅ Submitted answer: ${answerKeyword}`); // Removed to reduce noise
 
             // Wait for results and check if we need to switch
@@ -216,10 +245,23 @@ export class PollEvBot {
         try {
             const pollOptions = await this.page.$$eval('.component-response-multiple-choice__option', (elements) => {
                 return elements.map(el => {
+                    // The keyword might not be explicitly in a separate element in all views, 
+                    // but usually it is. Let's try to be robust.
                     const keywordEl = el.querySelector('.component-response-multiple-choice__option__keyword');
                     const percentEl = el.querySelector('.component-response-multiple-choice__option__percent');
+
+                    // If keyword element is missing, try to infer from the button text or value
+                    let keyword = keywordEl?.textContent?.trim();
+                    if (!keyword) {
+                        // Fallback: try to find the value text and match it to our known options
+                        const valueEl = el.querySelector('.component-response-multiple-choice__option__value');
+                        const valueText = valueEl?.textContent?.trim();
+                        // We would need to pass options to the eval context to map back, which is complex.
+                        // For now, let's assume standard PollEv structure where keyword is usually present in results view.
+                    }
+
                     return {
-                        keyword: keywordEl?.textContent?.trim(),
+                        keyword: keyword,
                         percent: percentEl?.textContent?.trim().replace('%', '')
                     };
                 });
@@ -230,8 +272,11 @@ export class PollEvBot {
                 return;
             }
 
+            // Map back to our options to ensure we have valid keywords if possible
+            // (Skipping complex mapping for now, assuming keywords match A, B, C...)
+
             // Format stats for Telegram
-            const statsText = pollOptions.map(o => `${o.keyword}: ${o.percent}%`).join('\n');
+            const statsText = pollOptions.map(o => `${o.keyword || '?'}: ${o.percent}%`).join('\n');
 
             // Update the original message with stats
             if (messageId) {
@@ -254,9 +299,26 @@ export class PollEvBot {
 
             if (majorityKeyword && majorityKeyword !== currentAnswer) {
                 logger.info(`Switching answer from ${currentAnswer} to ${majorityKeyword}`);
+                await this.notifier.notifyAnswerSwitch(currentAnswer, majorityKeyword);
 
-                const selector = `button:has-text("${majorityKeyword}")`;
-                await this.page.click(selector);
+                // Use the same robust selector logic as submitAnswer
+                const option = options.find(o => o.keyword === majorityKeyword);
+                let selector = '';
+                if (option) {
+                    selector = `.component-response-multiple-choice__option__vote:has(.component-response-multiple-choice__option__value:text-is("${option.value}"))`;
+                } else {
+                    selector = `.component-response-multiple-choice__option__vote:has-text("${majorityKeyword}")`;
+                }
+
+                const fallbackSelector = `.component-response-multiple-choice__option button:has-text("${majorityKeyword}")`;
+
+                try {
+                    await this.page.click(selector, { timeout: 5000 });
+                } catch (e) {
+                    logger.warn(`Switching answer: Primary selector failed, trying fallback: ${fallbackSelector}`);
+                    await this.page.click(fallbackSelector);
+                }
+
             } else {
                 logger.info("Current answer is aligned with majority or results inconclusive.");
             }

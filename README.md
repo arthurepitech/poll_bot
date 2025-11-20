@@ -62,6 +62,33 @@ We use PM2 to keep the bot running in the background and restart it automaticall
    ```
 
 ## Useful Commands
-- Stop the bot: `pm2 stop poll-bot`
-- Restart the bot: `pm2 restart poll-bot`
-- Monitor status: `pm2 monit`
+
+### Managing the Process
+- **Stop the bot**:
+  ```bash
+  pm2 stop poll-bot
+  ```
+- **Restart the bot** (useful after updates):
+  ```bash
+  pm2 restart poll-bot
+  ```
+- **Delete the bot** from PM2:
+  ```bash
+  pm2 delete poll-bot
+  ```
+
+### Monitoring & Logs
+- **View real-time logs**:
+  ```bash
+  pm2 logs poll-bot
+  # Add --lines 100 to see more history
+  pm2 logs poll-bot --lines 100
+  ```
+- **Monitor CPU/Memory usage**:
+  ```bash
+  pm2 monit
+  ```
+- **List all processes**:
+  ```bash
+  pm2 list
+  ```
