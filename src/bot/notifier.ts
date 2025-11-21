@@ -87,4 +87,8 @@ export class TelegramNotifier {
             logger.error(`Failed to update poll message: ${error}`);
         }
     }
+
+    async notifyAnswerSwitch(oldAnswer: string, newAnswer: string): Promise<void> {
+        await this.sendMessage(`🔄 *Answer Switched*\n\nPrevious: ${this.escapeMarkdown(oldAnswer)}\nNew: ${this.escapeMarkdown(newAnswer)}\n\nReason: Majority vote changed.`);
+    }
 }
