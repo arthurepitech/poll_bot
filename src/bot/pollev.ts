@@ -234,7 +234,7 @@ export class PollEvBot {
 
         } catch (error) {
             logger.error(`Failed to submit answer: ${error}`);
-            await this.notifier.sendMessage(`❌ Failed to submit answer: ${error}`);
+            await this.notifier.sendMessage(this.notifier.escapeMarkdown(`❌ Failed to submit answer: ${error}`));
         }
     }
 

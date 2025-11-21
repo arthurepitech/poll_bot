@@ -19,21 +19,25 @@ export class TelegramNotifier {
     async sendMessage(message: string): Promise<void> {
         if (!this.bot || !this.chatId) return;
         try {
-            await this.bot.telegram.sendMessage(this.chatId, message);
+            await this.bot.telegram.sendMessage(this.chatId, message, { parse_mode: 'MarkdownV2' });
         } catch (error) {
             logger.error(`Failed to send Telegram message: ${error}`);
         }
     }
 
     async notifyClassStart(day: string, start: string, end: string): Promise<void> {
-        await this.sendMessage(`🏫 *Class Started* (${day})\n⏰ ${start} - ${end}\nBot is now monitoring for polls.`);
+        const safeDay = this.escapeMarkdown(day);
+        const safeStart = this.escapeMarkdown(start);
+        const safeEnd = this.escapeMarkdown(end);
+        await this.sendMessage(`🏫 *Class Started* \(${safeDay}\)\n⏰ ${safeStart} \- ${safeEnd}\nBot is now monitoring for polls\.`);
     }
 
     async notifyClassEnd(day: string): Promise<void> {
-        await this.sendMessage(`🏁 *Class Ended* (${day})\nBot is going to sleep.`);
+        const safeDay = this.escapeMarkdown(day);
+        await this.sendMessage(`🏁 *Class Ended* \(${safeDay}\)\nBot is going to sleep\.`);
     }
 
-    private escapeMarkdown(text: string): string {
+    public escapeMarkdown(text: string): string {
         return text.replace(/[_*[\]()~`>#+\-=|{}.!]/g, '\\$&');
     }
 
