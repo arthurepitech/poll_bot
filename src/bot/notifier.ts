@@ -29,12 +29,12 @@ export class TelegramNotifier {
         const safeDay = this.escapeMarkdown(day);
         const safeStart = this.escapeMarkdown(start);
         const safeEnd = this.escapeMarkdown(end);
-        await this.sendMessage(`🏫 *Class Started* \(${safeDay}\)\n⏰ ${safeStart} \- ${safeEnd}\nBot is now monitoring for polls\.`);
+        await this.sendMessage(`🏫 *Class Started* \\(${safeDay}\\)\n⏰ ${safeStart} \\- ${safeEnd}\nBot is now monitoring for polls\\.`);
     }
 
     async notifyClassEnd(day: string): Promise<void> {
         const safeDay = this.escapeMarkdown(day);
-        await this.sendMessage(`🏁 *Class Ended* \(${safeDay}\)\nBot is going to sleep\.`);
+        await this.sendMessage(`🏁 *Class Ended* \\(${safeDay}\\)\nBot is going to sleep\\.`);
     }
 
     public escapeMarkdown(text: string): string {
@@ -93,6 +93,6 @@ export class TelegramNotifier {
     }
 
     async notifyAnswerSwitch(oldAnswer: string, newAnswer: string): Promise<void> {
-        await this.sendMessage(`🔄 *Answer Switched*\n\nPrevious: ${this.escapeMarkdown(oldAnswer)}\nNew: ${this.escapeMarkdown(newAnswer)}\n\nReason: Majority vote changed.`);
+        await this.sendMessage(`🔄 *Answer Switched*\n\nPrevious: ${this.escapeMarkdown(oldAnswer)}\nNew: ${this.escapeMarkdown(newAnswer)}\n\nReason: Majority vote changed\\.`);
     }
 }
